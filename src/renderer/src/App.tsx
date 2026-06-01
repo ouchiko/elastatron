@@ -1,17 +1,33 @@
-import { Button } from '@renderer/components/ui/button'
-import { useAppStore } from '@renderer/store'
+import { Group, Panel, Separator, useDefaultLayout } from 'react-resizable-panels'
+import { EndpointList } from '@renderer/components/panels/EndpointList'
+import { IndexList } from '@renderer/components/panels/IndexList'
+import { QueryWorkspace } from '@renderer/components/panels/QueryWorkspace'
 
 export default function App(): JSX.Element {
-  const count = useAppStore((s) => s.count)
-  const increment = useAppStore((s) => s.increment)
+  const { defaultLayout, onLayoutChanged } = useDefaultLayout({
+    id: 'elastatron-layout',
+    storage: localStorage
+  })
 
   return (
-    <div className="flex h-screen items-center justify-center bg-background text-foreground">
-      <div className="flex flex-col items-center gap-4">
-        <h1 className="text-2xl font-bold tracking-tight">Elastatron</h1>
-        <p className="text-sm text-muted-foreground">Elasticsearch Desktop Client</p>
-        <Button onClick={increment}>Count: {count}</Button>
-      </div>
+    <div className="h-screen bg-background text-foreground">
+      <Group
+        direction="horizontal"
+        defaultLayout={defaultLayout}
+        onLayoutChanged={onLayoutChanged}
+      >
+        <Panel defaultSize={20} minSize={15}>
+          <EndpointList />
+        </Panel>
+        <Separator className="w-px bg-border transition-colors hover:bg-primary" />
+        <Panel defaultSize={60} minSize={30}>
+          <QueryWorkspace />
+        </Panel>
+        <Separator className="w-px bg-border transition-colors hover:bg-primary" />
+        <Panel defaultSize={20} minSize={15}>
+          <IndexList />
+        </Panel>
+      </Group>
     </div>
   )
 }

@@ -1,11 +1,9 @@
 import { create } from 'zustand'
 
 interface AppStore {
-  count: number
-  increment: () => void
+  _placeholder: null
 }
 
-export const useAppStore = create<AppStore>((set) => ({
-  count: 0,
-  increment: () => set((s) => ({ count: s.count + 1 }))
+export const useAppStore = create<AppStore>(() => ({
+  _placeholder: null
 }))
