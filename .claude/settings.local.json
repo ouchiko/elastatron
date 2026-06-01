@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gh repo *)"
+      "Bash(gh repo *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(brew install *)",
+      "Bash(gh issue *)",
+      "Bash(npm install *)",
+      "Bash(npx electron-vite *)",
+      "Bash(npx electron-builder *)"
     ]
   }
 }
