@@ -8,8 +8,18 @@ export interface StatusEvent {
   error?: string
 }
 
+export interface IndexMeta {
+  name: string
+  health: 'green' | 'yellow' | 'red' | 'unknown'
+  docsCount: number
+  size: string
+}
+
 declare global {
   interface Window {
+    indices: {
+      list: () => Promise<IndexMeta[]>
+    }
     endpoints: {
       list: () => Promise<Endpoint[]>
       add: (input: EndpointInput) => Promise<Endpoint>

@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { EndpointInput, EndpointMeta } from '../main/endpoints'
-import type { StatusEvent } from '../main/connection'
+import type { StatusEvent, IndexMeta } from '../main/connection'
 
 const endpointsAPI = {
   list: (): Promise<EndpointMeta[]> => ipcRenderer.invoke('endpoints:list'),
@@ -11,6 +11,10 @@ const endpointsAPI = {
   delete: (id: string): Promise<void> => ipcRenderer.invoke('endpoints:delete', id),
   getActive: (): Promise<string | null> => ipcRenderer.invoke('endpoints:getActive'),
   setActive: (id: string): Promise<void> => ipcRenderer.invoke('endpoints:setActive', id)
+}
+
+const indicesAPI = {
+  list: (): Promise<IndexMeta[]> => ipcRenderer.invoke('indices:list')
 }
 
 const connectionAPI = {
@@ -26,6 +30,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('endpoints', endpointsAPI)
     contextBridge.exposeInMainWorld('connection', connectionAPI)
+    contextBridge.exposeInMainWorld('indices', indicesAPI)
   } catch (error) {
     console.error(error)
   }
@@ -36,4 +41,6 @@ if (process.contextIsolated) {
   window.endpoints = endpointsAPI
   // @ts-ignore
   window.connection = connectionAPI
+  // @ts-ignore
+  window.indices = indicesAPI
 }

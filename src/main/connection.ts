@@ -86,3 +86,23 @@ export function getStatus(): StatusEvent {
 export function getClient(): Client | null {
   return client
 }
+
+export interface IndexMeta {
+  name: string
+  health: 'green' | 'yellow' | 'red' | 'unknown'
+  docsCount: number
+  size: string
+}
+
+export async function listIndices(): Promise<IndexMeta[]> {
+  return withReconnect(async (c) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows: any[] = await c.cat.indices({ format: 'json', s: 'index' })
+    return rows.map((r) => ({
+      name: String(r.index ?? ''),
+      health: (['green', 'yellow', 'red'].includes(r.health) ? r.health : 'unknown') as IndexMeta['health'],
+      docsCount: Number(r['docs.count'] ?? 0),
+      size: String(r['store.size'] ?? '0b')
+    }))
+  })
+}

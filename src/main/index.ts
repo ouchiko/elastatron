@@ -10,7 +10,7 @@ import {
   setActiveEndpoint,
   EndpointInput
 } from './endpoints'
-import { connectTo, getStatus } from './connection'
+import { connectTo, getStatus, listIndices } from './connection'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -57,6 +57,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('connection:connect', (_, id: string) => connectTo(id))
   ipcMain.handle('connection:getStatus', () => getStatus())
+  ipcMain.handle('indices:list', () => listIndices())
 
   createWindow()
 
