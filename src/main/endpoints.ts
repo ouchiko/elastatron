@@ -109,3 +109,14 @@ export function getActiveEndpointId(): string | null {
 export function setActiveEndpoint(id: string): void {
   writeJSON(activePath, { activeId: id })
 }
+
+export function getCredential(id: string): string | null {
+  const creds = readJSON<Record<string, string>>(credentialsPath, {})
+  const encrypted = creds[id]
+  if (!encrypted) return null
+  try {
+    return safeStorage.decryptString(Buffer.from(encrypted, 'base64'))
+  } catch {
+    return null
+  }
+}

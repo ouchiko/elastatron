@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { useEndpointsStore } from '@renderer/store/endpoints'
+import { useConnectionStore } from '@renderer/store/connection'
 import { EndpointDialog } from '@renderer/components/EndpointDialog'
 import { Button } from '@renderer/components/ui/button'
 import type { Endpoint, EndpointInput } from '@renderer/types/endpoint'
+import type { ConnStatus } from '@renderer/types/electron'
 import { cn } from '@renderer/lib/utils'
 
 export function EndpointList(): JSX.Element {
   const { endpoints, activeId, load, add, update, remove, setActive } = useEndpointsStore()
+  const connStatus = useConnectionStore((s) => s.status)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Endpoint | undefined>(undefined)
 
@@ -33,10 +36,6 @@ export function EndpointList(): JSX.Element {
     }
   }
 
-  async function handleDelete(ep: Endpoint): Promise<void> {
-    await remove(ep.id)
-  }
-
   return (
     <div className="flex h-full flex-col border-r border-border">
       <div className="flex items-center justify-between border-b border-border px-3 py-2">
@@ -60,9 +59,10 @@ export function EndpointList(): JSX.Element {
                 key={ep.id}
                 endpoint={ep}
                 isActive={ep.id === activeId}
+                connStatus={ep.id === activeId ? connStatus : 'idle'}
                 onSelect={() => setActive(ep.id)}
                 onEdit={() => openEdit(ep)}
-                onDelete={() => handleDelete(ep)}
+                onDelete={() => remove(ep.id)}
               />
             ))}
           </ul>
@@ -82,12 +82,34 @@ export function EndpointList(): JSX.Element {
 interface RowProps {
   endpoint: Endpoint
   isActive: boolean
+  connStatus: ConnStatus
   onSelect: () => void
   onEdit: () => void
   onDelete: () => void
 }
 
-function EndpointRow({ endpoint, isActive, onSelect, onEdit, onDelete }: RowProps): JSX.Element {
+function statusDot(status: ConnStatus, isActive: boolean): string {
+  if (!isActive) return 'bg-muted'
+  switch (status) {
+    case 'connected':
+      return 'bg-green-500'
+    case 'connecting':
+      return 'bg-yellow-500 animate-pulse'
+    case 'error':
+      return 'bg-red-500'
+    default:
+      return 'bg-muted'
+  }
+}
+
+function EndpointRow({
+  endpoint,
+  isActive,
+  connStatus,
+  onSelect,
+  onEdit,
+  onDelete
+}: RowProps): JSX.Element {
   return (
     <li
       className={cn(
@@ -98,7 +120,8 @@ function EndpointRow({ endpoint, isActive, onSelect, onEdit, onDelete }: RowProp
     >
       <div className="flex min-w-0 items-center gap-2">
         <span
-          className={cn('h-2 w-2 shrink-0 rounded-full', isActive ? 'bg-green-500' : 'bg-muted')}
+          title={connStatus}
+          className={cn('h-2 w-2 shrink-0 rounded-full', statusDot(connStatus, isActive))}
         />
         <div className="min-w-0">
           <div className="truncate text-sm font-medium">{endpoint.name}</div>

@@ -10,6 +10,7 @@ import {
   setActiveEndpoint,
   EndpointInput
 } from './endpoints'
+import { connectTo, getStatus } from './connection'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -53,6 +54,9 @@ app.whenReady().then(() => {
   ipcMain.handle('endpoints:delete', (_, id: string) => deleteEndpoint(id))
   ipcMain.handle('endpoints:getActive', () => getActiveEndpointId())
   ipcMain.handle('endpoints:setActive', (_, id: string) => setActiveEndpoint(id))
+
+  ipcMain.handle('connection:connect', (_, id: string) => connectTo(id))
+  ipcMain.handle('connection:getStatus', () => getStatus())
 
   createWindow()
 

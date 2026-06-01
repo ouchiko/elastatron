@@ -21,6 +21,9 @@ export const useEndpointsStore = create<EndpointsStore>((set) => ({
       window.endpoints.getActive()
     ])
     set({ endpoints, activeId })
+    if (activeId) {
+      window.connection.connect(activeId)
+    }
   },
 
   add: async (input) => {
@@ -47,5 +50,6 @@ export const useEndpointsStore = create<EndpointsStore>((set) => ({
   setActive: async (id) => {
     await window.endpoints.setActive(id)
     set({ activeId: id })
+    window.connection.connect(id)
   }
 }))

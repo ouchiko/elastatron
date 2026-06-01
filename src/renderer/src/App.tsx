@@ -1,13 +1,21 @@
+import { useEffect } from 'react'
 import { Group, Panel, Separator, useDefaultLayout } from 'react-resizable-panels'
 import { EndpointList } from '@renderer/components/panels/EndpointList'
 import { IndexList } from '@renderer/components/panels/IndexList'
 import { QueryWorkspace } from '@renderer/components/panels/QueryWorkspace'
+import { Toaster } from '@renderer/components/Toaster'
+import { useConnectionStore } from '@renderer/store/connection'
 
 export default function App(): JSX.Element {
+  const onStatusUpdate = useConnectionStore((s) => s.onStatusUpdate)
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
     id: 'elastatron-layout',
     storage: localStorage
   })
+
+  useEffect(() => {
+    window.connection.onStatus(onStatusUpdate)
+  }, [onStatusUpdate])
 
   return (
     <div className="h-screen bg-background text-foreground">
@@ -28,6 +36,7 @@ export default function App(): JSX.Element {
           <IndexList />
         </Panel>
       </Group>
+      <Toaster />
     </div>
   )
 }
