@@ -1,6 +1,15 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import {
+  listEndpoints,
+  addEndpoint,
+  updateEndpoint,
+  deleteEndpoint,
+  getActiveEndpointId,
+  setActiveEndpoint,
+  EndpointInput
+} from './endpoints'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -35,6 +44,15 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
+  ipcMain.handle('endpoints:list', () => listEndpoints())
+  ipcMain.handle('endpoints:add', (_, input: EndpointInput) => addEndpoint(input))
+  ipcMain.handle('endpoints:update', (_, id: string, input: EndpointInput) =>
+    updateEndpoint(id, input)
+  )
+  ipcMain.handle('endpoints:delete', (_, id: string) => deleteEndpoint(id))
+  ipcMain.handle('endpoints:getActive', () => getActiveEndpointId())
+  ipcMain.handle('endpoints:setActive', (_, id: string) => setActiveEndpoint(id))
 
   createWindow()
 
